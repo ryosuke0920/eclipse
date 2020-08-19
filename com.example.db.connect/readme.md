@@ -1,59 +1,52 @@
 # ojdbc6.jarをプロジェクトに追加する
 
-* プロジェクトのコンテキストメニュー
+## Eclipse作業  
+プロジェクトのコンテキストメニュー > ビルド・パス > 外部アーカイブの追加 > ojdbc6.jarを選択  
+> C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6.jar
 
-* ビルド・パス
+参照ライブラリーに追加され、Class.forNameの実行エラーが解消される。
 
-* 外部アーカイブの追加
+# Eclipseによる実行可能jarの作成
 
-* ojdbc6.jarを選択
-C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib
+## Eclipse作業
+プロジェクトのコンテキストメニュー > エクスポート > 実行可能jarの作成  
+起動構成を選択（1つだけ選択できるはず）  
+エクスポート先を選択（どこでもよい）  
 
-* 参照ライブラリーに追加される。
-
-
-# 実行可能jarの作成
-
-* プロジェクトのコンテキストメニュー
-
-* エクスポート
-
-* 実行可能jarの作成
-起動構成を選択
-エクスポート先を選択
-
-* 実行確認
-
+## コマンドプロンプト作業
+実行確認  
 > java -jar foo.jar
-
 
 # コマンドによるコンパイルと実行
 
-* コンパイル
-srcディレクトリに移動する。
-com\example\db\connect\Main.class を作成する。
-> javac com\example\db\connect\Main.java
+## コマンドプロンプト作業
 
-* 実行
-> java -classpath C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6.jar;./ com.example.db.connect.Main
+適当なフォルダに移動して、クラスファイルを出力するフォルダ（例：workフォルダ）を作成する。
+> cd tmp  
+> mkdir work  
 
+コンパイル
+> javac -d work C:\pleiades-e4.5-java_20160312\pleiades\workspace\com.example.db.connect\src\com\example\db\connect\Main.java
+
+実行確認（クラスパスにojdbc6.jarを追加する）
+> java -classpath work;C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6.jar com.example.db.connect.Main
 
 # jarファイルの作成と実行
 
-所定のフォルダ（.\work）にclassファイルを作成する。
-> javac -d .\work C:\pleiades-e4.5-java_20160312\pleiades\workspace\com.example.db.connect\src\com\example\db\connect\Main.java
+## エディタ作業
+manifest.txtの作成  
+> Main-Class: com.example.db.connect.Main  
+> Class-Path: ojdbc6.jar  
 
+## コマンドプロンプト作業
+jarの作成
+> jar -cfm foo.jar manifest.txt -C work .  
 
-manifest.txtの作成
-> Main-Class: com.example.db.connect.Main
-> Class-Path: ojdbc6.jar
+実行確認  
+ojdbc6.jarをfoo.jarと同じフォルダにコピーしてから実行する。  
+> java -jar foo.jar  
 
-
-* jarの作成
-
-> jar -cfm abc.jar manifest.txt -C work .
-
-* jarの実行
-ojdbc6.jarをabc.jarと同じフォルダに置いてから実行する
-> java -jar abc.jar
-
+### 補足
+Eclipseでjarを作成する時とは違い、foo.jarにojdbc6.jarを追加することはできない。  
+foo.jarをfoo.jar.zipに名前変更すれば中身を確認できる。  
+中身を見比べると内情を察することができる。
