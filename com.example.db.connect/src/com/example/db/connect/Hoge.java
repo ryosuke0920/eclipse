@@ -1,5 +1,7 @@
 package com.example.db.connect;
 
-public class Hoge {
+import javax.servlet.http.HttpServlet;
+
+public class Hoge extends HttpServlet {
 
 }
