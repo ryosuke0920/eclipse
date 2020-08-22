@@ -8,26 +8,43 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Objects;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class ReadFile {
 	final static Logger logger = Logger.getLogger(ReadFile.class.toString());
 
 	public static void main(String[] args) throws Exception {
-		logger.info("Start main...");
+		String driver = args[0];
+		String url = args[1];
+		String user = args[2];
+		String password = args[3];
+		String filepath = args[4];
 
-		Class.forName("oracle.jdbc.driver.OracleDriver");
+		System.out.println("Driver: " + driver);
+		System.out.println("URL: " + url);
+		System.out.println("User: " + user);
+		System.out.println("Password: " + password);
+		System.out.println("OK? Y/n");
+
+		Scanner scan = new Scanner(System.in);
+		String str = scan.next();
+		scan.close();
+		if (!Objects.equals(str, "Y")) {
+			System.out.println("Canceled.");
+			System.exit(0);
+		}
+
+		Class.forName(driver);
 		Connection conn = null;
-		String url = "jdbc:oracle:thin:@localhost:1521";
-		String user = "A1";
-		String password = "password";
 
 		try {
 			conn = DriverManager.getConnection(url, user, password);
 			conn.setAutoCommit(false);
 
 			CsvLoader loader = new CsvLoader();
-			loader.setFileFromString(args[0]);
+			loader.setFileFromString(filepath);
 			loader.setConn(conn);
 			loader.setSql("INSERT INTO sample (name) VALUES (?)");
 			loader.readAndInsert();
@@ -78,7 +95,7 @@ class CsvLoader {
 
 		/* イベントハンドラにしたい */
 		PreparedStatement ps = conn.prepareStatement(sql);
-		ps.setString(1,line);
+		ps.setString(1, line);
 		int i = ps.executeUpdate();
 		logger.info(i + " rows affected.");
 	}
