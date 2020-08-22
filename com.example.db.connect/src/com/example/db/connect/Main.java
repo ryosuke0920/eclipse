@@ -18,18 +18,17 @@ public class Main {
 		Class.forName("oracle.jdbc.driver.OracleDriver");
 		Connection conn = null;
 		String url = "jdbc:oracle:thin:@localhost:1521";
-		String user = "hr";
+		String user = "a1";
 		String password = "password";
 
 		try{
 			logger.info("try to connect.");
 			conn = DriverManager.getConnection(url, user, password);
 			Statement statement=conn.createStatement();
-			ResultSet result=statement.executeQuery("select EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER,"
-					+ " HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID from employees");
+			ResultSet result=statement.executeQuery("select name from sample");
 			while(result.next()){
 				ArrayList<String> list = new ArrayList<String>();
-				for(int i=1; i<=11; i++) {
+				for(int i=1; i<=1; i++) {
 					list.add(result.getString(i));
 				}
 				logger.info(list.toString());

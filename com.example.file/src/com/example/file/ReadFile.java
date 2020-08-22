@@ -3,57 +3,107 @@ package com.example.file;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
 public class ReadFile {
 	final static Logger logger = Logger.getLogger(ReadFile.class.toString());
 
-	public static void main(String[] args) {
-		logger.info("strat");
+	public static void main(String[] args) throws Exception {
+		logger.info("Start main...");
 
-		String path = System.getProperty("user.dir");
-		logger.info(path);
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection conn = null;
+		String url = "jdbc:oracle:thin:@localhost:1521";
+		String user = "A1";
+		String password = "password";
 
-		File file = null;
-		/*
-		file = new File("C:\\Eclilpse\\pleiades-e4.5-java_20160312\\workspace\\com.example.file\\resource\\sample_sjis.csv");
-		read(file, "Windows-31J");
+		try {
+			conn = DriverManager.getConnection(url, user, password);
+			conn.setAutoCommit(false);
 
-		file = new File("C:\\Eclilpse\\pleiades-e4.5-java_20160312\\workspace\\com.example.file\\resource\\sample_utf8.csv");
-		read(file, "UTF-8");
-		*/
-		ArrayList<String> argsList = new ArrayList<String>(Arrays.asList(args));
-		Iterator<String> it = argsList.iterator();
-		while(it.hasNext()){
-			String str = it.next();
-			file = new File(str);
-			if(! file.exists()) continue;
-			logger.info( "file is exists.(" + file.getAbsolutePath() + ")" );
-			read(file, "Windows-31J");
+			CsvLoader loader = new CsvLoader();
+			loader.setFileFromString(args[0]);
+			loader.setConn(conn);
+			loader.setSql("INSERT INTO sample (name) VALUES (?)");
+			loader.readAndInsert();
+
+			conn.commit();
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (conn != null && !conn.isClosed()) {
+				conn.close();
+				logger.info("Connection was closed.");
+			}
+		}
+	}
+}
+
+class CsvLoader {
+	final static Logger logger = Logger.getLogger(CsvLoader.class.toString());
+
+	String encoding = "Windows-31J";
+	String crlf = "\n";
+	File file;
+	Connection conn;
+	String sql;
+
+	public void setFileFromString(String str) {
+		setFile(new File(str));
+	}
+
+	public void readAndInsert() {
+		BufferedReader reader = null;
+		try {
+			logger.info("Reading file is " + file.toString());
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				loadedLine(line);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
-	public static void read(File file, String encording) {
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encording));
-			String line = null;
-			while((line = reader.readLine()) != null){
-				logger.info(line);
-			}
-		}
-		catch(FileNotFoundException e){
-			e.printStackTrace();
-		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
+	public void loadedLine(String line) throws SQLException {
+		line = line.replace(crlf, "");
+		logger.info("A line is " + line);
 
+		/* イベントハンドラにしたい */
+		PreparedStatement ps = conn.prepareStatement(sql);
+		ps.setString(1,line);
+		int i = ps.executeUpdate();
+		logger.info(i + " rows affected.");
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
+	}
+
+	public Connection getConn() {
+		return conn;
+	}
+
+	public void setConn(Connection conn) {
+		this.conn = conn;
+	}
+
+	public String getSql() {
+		return sql;
+	}
+
+	public void setSql(String sql) {
+		this.sql = sql;
 	}
 }
