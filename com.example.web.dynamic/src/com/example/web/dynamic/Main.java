@@ -26,11 +26,11 @@ public class Main extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		response.setContentType("text/html");
+		response.setContentType("text/html; charset=UTF-8");
 		PrintWriter out = response.getWriter();
-		out.println("<html><head></head><body>");
+		out.println("<!doctype html><html><head><meta charset=\"UTF-8\"></head><body>");
 		out.println("<p>Sample</p>");
-		out.println("<p>Hello World!</p>");
+		out.println("<p>Hello World!　こんにちは！</p>");
 		Iterator<String> it = list.iterator();
 		while(it.hasNext()){
 			out.println(it.next() + "<br />");
@@ -40,7 +40,7 @@ public class Main extends HttpServlet {
 }
 
 class DBtester {
-	final static Logger logger = Logger.getLogger(Main.class.toString());
+	final static Logger logger = Logger.getLogger(DBtester.class.toString());
 
 	public static ArrayList<String> main() throws Exception{
 		//logger.setLevel(Level.ALL);
