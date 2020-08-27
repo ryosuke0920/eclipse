@@ -25,4 +25,10 @@
     <!--
     <Manager pathname="" />
     -->
+
+	<Resource auth="Container" driverClassName="oracle.jdbc.OracleDriver"
+		maxIdle="10" maxTotal="20" maxWaitMillis="-1" name="jdbc/myoracle"
+		password="password" type="javax.sql.DataSource" url="jdbc:oracle:thin:@localhost:1521:XE"
+		username="A1" factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" />
+
 </Context>
